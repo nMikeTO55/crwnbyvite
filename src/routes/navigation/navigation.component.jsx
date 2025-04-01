@@ -1,4 +1,5 @@
 import { Outlet, Link } from "react-router-dom"
+import CrwnLogo from "../../assets/crown.svg";
 
 import './navigation.styles.scss';
 
@@ -7,7 +8,7 @@ const Navigation = ()=>{
     <>
       <div className="navigation">
         <Link className="logo-container" to='/'>
-          <div>Logo</div>
+          <img src={CrwnLogo} alt="SVG" />
         </Link>
         <div className="nav-links-container">
           <Link className="nav-link" to='/shop'>
