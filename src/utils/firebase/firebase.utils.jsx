@@ -2,9 +2,9 @@ import { initializeApp } from "firebase/app";
 
 import {
   getAuth,
-  signInWithRedirect,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword
 } from 'firebase/auth';
 
 import {
@@ -32,16 +32,19 @@ provider.setCustomParameters({
   prompt: "select_account"
 });
 
-export const auth = getAuth();
+export const auth                  = getAuth();
 export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const db                    = getFirestore();
 
-export const db = getFirestore();
+export const createUserDocumentFromAuth = async (
+  userAuth, 
+  additionalInformation = {}
+) => {
+  if(!userAuth) return;
 
-export const createUserDocumentFromAuth = async (userAuth) => {
   const userDocRef = doc(db, 'users', userAuth.uid);
 
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot.exists())
 
   if (!userSnapshot.exists()) {
     const {displayName, email} = userAuth;
@@ -51,7 +54,8 @@ export const createUserDocumentFromAuth = async (userAuth) => {
       await setDoc(userDocRef, {
         displayName,
         email,
-        createAt
+        createAt,
+        ...additionalInformation
       });
     } catch (error) {
       console.log('Problem with add!', error.message);
@@ -61,3 +65,8 @@ export const createUserDocumentFromAuth = async (userAuth) => {
   return userDocRef;
 }
 
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if(!email || !password) return;
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+}
